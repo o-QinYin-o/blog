@@ -15,7 +15,7 @@ jobs:
     steps:
       # 拉取代码
       - name: Checkout 🛎️
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           persist-credentials: false
 
@@ -33,7 +33,7 @@ jobs:
         uses: JamesIves/github-pages-deploy-action@releases/v4
         with:
           # 这里的 ACCESS_TOKEN 名字需要和下文中的相对应
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           # 打包后的文件部署到哪个分支上
           BRANCH: gh-pages
           # 打包后的文件在哪里
