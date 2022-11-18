@@ -25,7 +25,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Build VuePress
-        run: yarn run build
+        run: yarn docs:build
       - name: Deploy to Pages
         env:
          TZ: Asia/Shanghai

@@ -1,2 +1,4 @@
 node_modules
 /_site/
+docs/.vuepress/dist
+yarn.lock
