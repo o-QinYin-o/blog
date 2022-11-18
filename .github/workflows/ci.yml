@@ -1,5 +1,5 @@
 # action 的名称
-name: Deploy GitHub Pages
+name: CI
 
 # 触发条件：在 push 到 main 分支后
 on:
@@ -14,17 +14,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # 拉取代码
-      - name: Checkout
+      - name: Checkout 🛎️
         uses: actions/checkout@v2
         with:
           persist-credentials: false
 
       # 生成静态文件
-      - name: Build
-        run: yarn && yarn docs:build
+      - name: Install and Build 🔧 
+        run: |
+          yarn
+          yarn build
+        env:
+          NODE_OPTIONS: '--max_old_space_size=4096'
 
       # 部署到 GitHub Pages
-      - name: Deploy
+      - name: Deploy 🚀
         # 使用别人写好的一个 action
         uses: JamesIves/github-pages-deploy-action@releases/v3
         with:

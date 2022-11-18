@@ -1,15 +1,24 @@
+const { ua } = require('./ua.js');
+
 module.exports = {
-  title: 'Hello VuePress',
-  description: 'Just playing around',
-  head: [['link', { rel: 'icon', href: '/img/logo.png' }]],
+  title: '知木兮',
+  description: '记录个人博客，见证成长',
+  head: [['link', { rel: 'icon', href: '/img/logo.png' }], [...ua]],
   port: 3000,
   base: '/blog/',
   markdown: {
     lineNumbers: true, // 代码显示行号
   },
+  locales: {
+    '/': {
+      lang: 'zh-CN',
+    },
+  },
   themeConfig: {
+    sidebar: 'auto',
+    repo: 'https://github.com/o-QinYin-o/blog',
+    repoLabel: 'Github',
     nav: [
-      { text: '首页', link: '/' },
       {
         text: '博文',
         items: [
@@ -19,7 +28,7 @@ module.exports = {
         ],
       },
       { text: '关于', link: '/about/' },
-      { text: 'Github', link: 'https://www.github.com/meizhaohui' },
+      { text: 'Github', link: 'https://github.com/o-QinYin-o/blog' },
     ],
     sidebar: {
       '/python/': [
