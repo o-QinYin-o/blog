@@ -1,40 +1,36 @@
-name: vuepress-deploy # 这里的名字就是你刚刚自定义那个文件的名字
+# action 的名称
+name: Deploy GitHub Pages
+
+# 触发条件：在 push 到 main 分支后
 on:
   push:
     branches:
-      - main      
+      - main
+
+# 任务
 jobs:
   build-and-deploy:
+    # 服务器环境：最新版 Ubuntu
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node: ['lts/fermium']
     steps:
+      # 拉取代码
       - name: Checkout
-        uses: actions/checkout@main
+        uses: actions/checkout@v2
         with:
-          ref: 'main'
           persist-credentials: false
-          fetch-depth: 0
-        env:
-          TZ: Asia/Shanghai
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@main
+
+      # 生成静态文件
+      - name: Build
+        run: yarn && yarn docs:build
+
+      # 部署到 GitHub Pages
+      - name: Deploy
+        # 使用别人写好的一个 action
+        uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
-          node-version:  ${{ matrix.node }}
-      - name: Install dependencies
-        run: yarn
-      - name: Build VuePress
-        run: yarn docs:build
-      - name: Deploy to Pages
-        env:
-         TZ: Asia/Shanghai
-        run: |
-         cd docs/.vuepress/dist
-         git config --global init.defaultBranch main
-         git init
-         git config user.name "qinyin"
-         git config user.email "12233@gmail.com"
-         git add .
-         git commit -m "Deploying to gh-pages from @ $GITHUB_SHA in $(date +"%Y年%m月%d日 %T %Z")"
-         git push -f https://o-QinYin-o:${{ secrets.ACCESS_TOKEN }}@github.com:o-QinYin-o/blog.git main:gh-pages         
+          # 这里的 ACCESS_TOKEN 名字需要和下文中的相对应
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          # 打包后的文件部署到哪个分支上
+          BRANCH: gh-pages
+          # 打包后的文件在哪里
+          FOLDER: docs/.vuepress/dist
