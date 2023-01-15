@@ -3,7 +3,7 @@ const { ua } = require('./ua.js');
 module.exports = {
   title: '知木兮',
   description: '记录个人博客，见证成长',
-  head: [['link', { rel: 'icon', href: '/img/logo.png' }], [...ua]],
+  head: [['link', { rel: 'icon', href: '/img/logo.jpg' }], [...ua]],
   port: 3000,
   base: '/blog/',
   markdown: {
@@ -31,8 +31,6 @@ module.exports = {
           { text: 'Web', link: '/web/' },
         ],
       },
-      { text: '关于', link: '/about/' },
-      { text: 'Github', link: 'https://github.com/o-QinYin-o/blog' },
     ],
     sidebar: {
       '/python/': [
