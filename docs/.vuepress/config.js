@@ -20,6 +20,10 @@ module.exports = {
     repoLabel: 'Github',
     nav: [
       {
+        text: '前端面试总结',
+        link: '/interview/',
+      },
+      {
         text: '博文',
         items: [
           { text: 'Python', link: '/python/' },
