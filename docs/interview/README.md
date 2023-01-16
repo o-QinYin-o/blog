@@ -510,6 +510,8 @@ key是为vue中vnode的唯一标识，可以通过这个key，diff操作可以�
 
 ### vue事件绑定原理
 
+Vue中通过v-on或其语法糖@指令来给元素绑定事件并且提供了事件修饰符，基本流程是进行模板编译生成AST，生成render函数后并执行得到VNode，VNode生成真实DOM节点或者组件时候使用addEventListener方法进行事件绑定。
+
 ### vue-router 路由钩子函数
 ::: tip 种类
 全局守卫、路由守卫、组件守卫
@@ -659,6 +661,42 @@ keep-alive是 Vue 内置的一个组件，可以实现组件缓存，当组件�
 
 ### 自定义指令及其原理
 
+如何进行自定义指令？
+```javascript
+// 注册一个全局自定义指令 v-focus
+Vue.directive('focus', {
+  // 当被绑定的元素插入到DOM中
+  inserted: function (el) {
+    el.foucus()
+  }
+})
+
+// 注册局部指令
+directive: {
+  foucs: {
+    inserted: function (el) {
+      el.foucs()
+    }
+  }
+}
+```
+
+::: tip 指令内部提供的钩子函数
+bind: 可以进行一次性的初始化设置 <br/>
+inserted: 被绑定的元素插入父节点调用 <br/>
+update: vnode更新时调用<br/>
+componentUpdated: vnode及其子vnode全部更新后调用<br/>
+unbind: 指令与元素解绑时候调用
+:::
+
+**原理:**
+
+1. 在生成 ast 语法树时，遇到指令会给当前元素添加 directives 属性
+2. 通过 genDirectives 生成指令代码
+3. 在 patch 前将指令的钩子提取到 cbs 中，在 patch 过程中调用对应的钩子。
+4. 当执行指令对应钩子函数时，调用对应指令定义方法。
+
+
 ### vue模板编译原理
 
 Vue 的编译过程就是将 template 转化为 render 函数的过程
@@ -721,6 +759,42 @@ Vue.component('my-component', {
 diff算法采用同级比较
 
 ## React 🚩
+
+### 对“在react中，一切都是组件”的理解
+
+在 React 中，组件是 React 应用程序的构建块。这些组件将整个 React 应用程序的 UI 划分为小的、独立的、可重用的代码片段。React 独立渲染这些组件中的每一个，而不会影响应用程序 UI 的其余部分。因此，可以说，在 React 中，一切都是组件。
+### react的优势和缺点
+<span style="color: green; font-weight: 500">优点</span>
+* react提供了良好的文档、教程和培训资源
+
+<span style="color: red; font-weight: 500">缺点</span>
+* react是一个库，不是个完整的框架
+* react有一个庞大的库，需要时间去理解
+* react使用内联模板和JSX，会让编码变得复杂
+
+### JSX是什么
+
+JSX 是JavaScript XML 的简写。是 React 使用的一种文件，它利用 JavaScript 的表现力和类似 HTML 的模板语法。这使得 HTML 文件非常容易理解。此文件能使应用非常可靠，并能够提高其性能。
+
+### 浏览器为什么不能读取JSX
+
+浏览器不能直接读取JSX，只能理解JavaScript对象，而JSX不是常规的JavaScript对象。因此需要使用Babel等转译器将JSX文件转换成JavaScript对象，然后将其传递给浏览器。
+
+### 为什么要使用JSX
+
+它比常规 JavaScript 更快，因为它在将代码转换为 JavaScript 时执行优化。SX是类型安全的，大部分错误都可以在编译时发现。JSX使创建模板变得更加容易。
+
+### React 中 render() 的用途
+
+### 无状态组件和有状态组件的区别
+
+
+### React 事件机制
+
+React并不是将click事件绑定到了div的真实DOM上，而是在document处监听了所有的事件，当事件发生并且冒泡到document处的时候，React将事件内容封装并交由真正的处理函数运行。这样的方式不仅仅减少了内存的消耗，还能在组件挂在销毁时统一订阅和移除事件。
+
+### 区分有状态和无状态组件
+
 
 ## TypeScript 🚩
 
