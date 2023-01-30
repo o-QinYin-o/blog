@@ -932,6 +932,11 @@ JSX 是JavaScript XML 的简写。是 React 使用的一种文件，它利用 Ja
 
 ### 自定义hook
 通过自定义 Hook，可以将组件逻辑提取到可重用的函数中。自定义 Hook 是一个函数，其名称以 “use” 开头，函数内部可以调用其他的 Hook。
+
+hook: 将一些常用的、跨越多个组件的Hook功能，抽离出去形成一个函数
+
+* 函数名必须以use开头
+* 调用自定义Hook函数时，应该放到顶层
 ### 受控组件和非受控组件的理解
 
 |受控组件|非受控组件|
@@ -1091,10 +1096,10 @@ type T3 = T1 & T2 // {name: string, age: number}
 
 ### typescript中type和interface的区别
 
-相同点：
+<span>相同点：</span>
 1. 都可以描述“对象”或者“函数”
-2. 都允许拓展
-不同点：
+2. 都允许拓展：interface extends interface type extends type
+<span>不同点：</span>
 1. type可以声明基本类型别名，联合类型，元组
 2. interface能够声明合并
 
@@ -1405,9 +1410,23 @@ webPack是代码打包工具，存在出口、入口、loader和插件。webpack
 * optimize-css-assets-webpack-plugin 用于压缩css
 * eslint-webpack-plugin 用于检查代码中的错误
 
+
+### webpack & rollup
+
+rollup 和 webpack 共同点
+
+* 都是基于JavaScript 依赖系统的一个打包构建工具
+* 解析JavaScript的依赖树将代码输出为指定版本的JavaScript，浏览器或者node环境执行
+
+rollup 和 webpack 不同点
+
+* rollup相对webpack更轻量，构建的代码不会像webpack一样被注入大量的webpack内部结构；
+* rollup的生态并没有webpack工具强大
+* rollup可以与其他构建工具混合打包，比如vite
+
 ### vite vs webpack
 
-* wite开发环境使用`<script type=module>`引入文件，当请求某个文件的时候才会处理该文件，生产环境使用rollup+esbuild来打包js代码
+* vite开发环境使用`<script type=module>`引入文件，当请求某个文件的时候才会处理该文件，生产环境使用rollup+esbuild来打包js代码
 * webpack开发环境 webpack-dev-server 会使用babel-loader将代码递归的打包进内存然后再进行请求，生产环境使用babel来打包js代码
 
 
