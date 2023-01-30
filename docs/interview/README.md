@@ -1187,6 +1187,28 @@ wx:if wx:for
 
 ## 浏览器 🚩
 
+### axios是什么
+
+1. axios 是一个基于 promise的HTTP库，可以用在浏览器和node.js中，前端最流行的ajax请求库，
+2. react/vue 官方都推荐使用 axios 发 ajax请求
+
+### axios 特点
+1. 基于 promise 的异步 ajax 请求库，支持promise所有的API
+2. 浏览器端/node 端都可以使用，浏览器中创建XMLHttpRequests
+3. 支持请求／响应拦截器
+4. 支持请求取消
+5. 可以转换请求数据和响应数据，并对响应回来的内容自动转换成 JSON类型的数据6. 批量发送多个请求
+7. 安全性更高，客户端支持防御 XSRF，就是让你的每个请求都带一个从cookie中拿到的key, 根据浏览器同源策略，假冒的网站是拿不到你cookie中得key的，这样，后台就可以轻松辨别出这个请求是否是用户在假冒网站上的误导输入，从而采取正确的策略。
+
+### axios为什么既能在浏览器环境运行又能在服务器(node)环境运行？
+
+axios在浏览器端使用XMLHttpRequest对象发送ajax请求；在node环境使用http对象发送ajax请求。
+
+### axios相比原生ajax的优点
+
+1. 不符合关注分离（Separation of Concerns）的原则
+2. 基于原生的XHR开发，XHR本身的架构不清晰。
+
 ### 地址栏输入URL到数据返回的过程
 
 * 输入URL地址后，先进行DNS解析，将相应的域名解析为IP地址
@@ -1408,5 +1430,97 @@ webPack是代码打包工具，存在出口、入口、loader和插件。webpack
 7. 渲染进程对布局树进行分层，分别格栅化每一层，并得到合成帧
 8. 渲染进程将合成帧信息发送给GPU进程显示到页面中
 
+## Node
+
+### 对Node.js的理解？优缺点？应用场景？
+
+Node.js 是一个开源与跨平台的JavaScript运行环境，在浏览器外运行 V8 Javascript 引擎，利用事件驱动、非租塞和异步输入输出模型等技术提高性能，可以理解为 Node.js 是一个服务器端的、非租塞式I/O的、事件驱动的JavaScript运行环境
+
+### 流（stream）是什么？
+
+流（stream）是驱动node.js应用的基础概念之一。是数据处理方法，用于按照顺序将输入读写到输出中；有四种流：
+
+* 可读流
+* 可写流
+* 双工流；可读写
+* 转换流；先写入再读出
+
+### node中的process的理解
+
+process 是Node中的线程容器，每一个Node应用会有一个process，开发者可以通过process对象控制和获取当前Node的进程。（process 对象是一个全局变量，提供了有关当前 Node.js进程的信息并对其进行控制，作为一个全局变量）
+
+### EventEmitter做了什么？
+
+node.js中任何对象发出的事件都是EventEmitter类的实例，所有EventEmiter类都可以使用eventEmitter.on()函数将事件侦听器附加到事件。
+
+
+
 ## 算法题 🚩
+
+### 手写 call、apply和bind方法
+
+手写call
+
+```javascript
+Function.prototype.myCall = function (context) {
+  if (typeof this !== 'function') {
+    throw new TypeError('is not function')
+  }
+  const symbolFn = Symbol()
+  const args = [...arguments].slice(1)
+  context = context || window
+
+  context[symbolFn] = this
+  const result = context[symbolFn](...args)
+
+  delete context[symbolFn]
+
+  return result
+}
+```
+
+手写apply
+
+```javascript
+Function.prototype.myApply = function (context) {
+  if (typeof this !== 'function') {
+    throw new TypeError('is not function')
+  }
+  context = context || window
+  const symbolFn = Symbol()
+  const args = [...arguments].slice(1)
+
+  context[symbolFn] = this
+  const result = args ? context[symbolFn](...args) : context[symbolFn]()
+
+  delete context[symbolFn]
+}
+```
+手写bind
+
+```javascript
+
+Function.prototype.myBind = function (context) {
+  if(typeof this !== 'function') {
+    throw TypeError('error');
+  }
+  const self = this;
+  const args = [...arguments].slice(1);
+  return function F() {
+    if(this instanceof F) {
+      return new self(...args, ...arguments);
+    }
+    return self.apply(context, args.concat(...arguments));
+  }
+}
+
+```
+
+### 手写promise
+
+### 手写instanceof
+
+### 手写数组去重
+
+### 手写判断有效的括号
 
