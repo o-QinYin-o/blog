@@ -1188,7 +1188,12 @@ wx:if wx:for
 在 Page 中定义 onPullDownRefresh 钩子函数,到达下拉刷新条件后，该钩子函数执行，发起请求方法 <br/>
 请求返回后，调用 wx.stopPullDownRefresh 停止下拉刷新 <br/>
 
+### 小程序获取openID
 
+1. 需要在微信小程序调用登录开发接口 wx.login() 获取用户登录凭证code
+2. 向服务器发送请求，并将code一起发送过去
+3. 接下来，在服务器端调用 auth.code2Session 接口
+4. 返回openId
 
 ## 浏览器 🚩
 
