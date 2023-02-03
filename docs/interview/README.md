@@ -406,6 +406,19 @@ js 是单线程运行的，在代码执行的时候，通过将不同函数的�
   * post传送的数据量较大，一般会被默认为不受限制
   * 请求也不会被缓存，也不会保留在浏览器历史记录里，安全性比较高
 
+### 懒加载的实现
+
+:::tip
+懒加载引入的原因：打开网站的会把网站上的所有图片全部加载出来，很有可能会造成卡顿和白屏的现象，用户体验会变得很差
+:::
+
+### 预加载的实现
+
+
+### 分包加载如何实现，webpack如何进行配置
+
+
+
 ### AMD 和 CMD
 
 :::tip
@@ -426,8 +439,28 @@ js 是单线程运行的，在代码执行的时候，通过将不同函数的�
 
 ### 继承方式
 
-1. 原型链继承
-2. 借用构造函数继承
+1. 原型链继承: 通过new父函数赋给子函数的原型对象上
+  ```javascript
+  function parType () {
+    this.property = true
+  }
+  partype.prototype.getParType = function () {
+    return this.property
+  }
+  function subType() {
+    this.subProperty = false
+  }
+  subType.prototype = new parType()
+  ```
+2. 借用构造函数继承: 
+  ```javascript
+  function ParType() {
+    this.color=['red', 'green']
+  }
+  function SubType() {
+    ParType.call(this)
+  }
+  ```
 3. 原型链+借用构造函数的组合继承
 4. 原型式继承
 5. 寄生式继承
@@ -557,6 +590,41 @@ v-for和v-if不要在同一标签中使用，因为解析时先解析v-for在解
 1. 保证性能下限
 2. 无需手动操作DOM
 3. 跨平台
+
+### vue-router路由钩子函数？执行顺序是什么？
+
+路由钩子函数种类有：全局守卫、路由守卫、组件守卫
+
+完整的导航解析流程：
+1. 导航被触发
+2. 在失活的组件里调用beforeRouterLeave守卫
+3. 调用全局的beforeEach守卫
+4. 在重用的组件调用beforeRouterUpdate守卫
+5. 在路由配置里面beforeEnter
+6. 解析异步路由组件
+7. 在被激活的组件里调用beforeRouterEnter
+8. 调用全局的beforeResolve守卫
+9. 导航被确认
+10. 调用全局的afterEach钩子
+11. 触发DOM更新
+12. 调用beforeRouterEnter守卫传给next的回调函数，创建好的组件实例会作为回调函数的参数传入
+
+
+### vue权限配置
+
+路由元信息（meta）: 可以在元信息中添加路由对应的权限,用户每次登陆后，将用户的角色返回。然后在访问页面时，`routes.beforeEach`中进行权限判断把路由的 meta 属性和用户的角色进行对比，如果用户的角色在路由的 roles 里，那就是能访问，如果不在就拒绝访问。
+  ```vue
+  routes: [
+    {
+      path: '/login',
+      name: 'login',
+      meta: {
+        roles: ['admin', 'user']
+      },
+      component: () => import('@/components/Login')
+    },
+  ],
+  ```
 
 ### v-model原理
 
@@ -700,8 +768,9 @@ nextTick中的回调是在下次DOM更新循环结束之后执行的延迟回调
 
 keep-alive是 Vue 内置的一个组件，可以实现组件缓存，当组件切换时不会对当前组件进行卸载。
 * 常用的属性：include/exclude，运行组件有条件的进行缓存；
-* 声明周期 activated/deactivated;
-* keep-alive运用LRU算法，选择最近最久未使用的组件予以淘汰
+* 声明周期 activated/deactivated; <br/>
+
+keep-alive 原理：keep-alive运用LRU算法，选择最近最久未使用的组件予以淘汰
 
 拓展补充：LRU算法是什么？
 1. 将新数据从尾部插入到`this.keys`中
@@ -1227,6 +1296,21 @@ axios在浏览器端使用XMLHttpRequest对象发送ajax请求；在node环境�
 * 客户端发送请求，找到相应的资源库
 * 客户端拿到数据，将数据渲染到页面
 
+### 前后端交互如何保证数据安全
+
+1. 使用 https
+2. 加签 验签
+```test
+加签
+1. 筛选并排序参数，获取全部的参数过滤空的参数并且按照参数名升序排列
+2. 参数名和参数值进行拼接，得到新的字符串
+3. 字符串前面加上秘钥key（秘钥key是接口提供方分配给接口接入方的），然后计算md5值（广泛使用密码散列函数，可以产生出一个128位的散列值，用于确保信息传输完整一致）转换成大写，得到的字符串作为sign的值放到请求参数里
+验签：使用上述方法得到一样的标签值，然后和参数中传递的sign值进行对比，如果是一致的则说明参数没有被篡改
+```
+3. 身份确认机制，每次请求都要验证是否合法
+4. charles第三方抓包工具可以抓取https明文，因此需要加密，AES对成加密方式和RSA非对成方式
+
+
 ### 如何解决跨域问题
 
 ::: tip
@@ -1351,6 +1435,7 @@ cache-control: no-store（真正的不缓存数据到本地） public（可以�
 
 * 200 请求成功
 * 301 资源被永久转移到其他URL
+* 304 无需再次传输请求的内容，也就是说可以使用缓存的内容
 * 404 请求资源不存在
 * 500 内部服务器错误
 
@@ -1369,9 +1454,9 @@ cache-control: no-store（真正的不缓存数据到本地） public（可以�
 * 压缩html、css、js等文件
 * 非阻塞js；js会阻止html文档的正常解析，所以经常会把script引入的js，放到html最底下。若需要让脚本位于页面顶部，会添加非阻塞属性（`defer` 和 `async`）
   ```javascript
-  // 使用defer
+  // 使用defer: 表示脚本可以延迟到文档完全被解释和显示之后再执行(在DOM完全构建完成后再运行，但会在DOMContentLoaded之后)
   <script defer src="foo.js" ></script>
-  // 使用async 
+  // 使用async: 浏览器不会阻止async脚本，但是其他脚本也不会等待async
   <script async src="foo.js"></script>
   ```
 * 图片压缩
