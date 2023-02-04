@@ -406,19 +406,6 @@ js 是单线程运行的，在代码执行的时候，通过将不同函数的�
   * post传送的数据量较大，一般会被默认为不受限制
   * 请求也不会被缓存，也不会保留在浏览器历史记录里，安全性比较高
 
-### 懒加载的实现
-
-:::tip
-懒加载引入的原因：打开网站的会把网站上的所有图片全部加载出来，很有可能会造成卡顿和白屏的现象，用户体验会变得很差
-:::
-
-### 预加载的实现
-
-
-### 分包加载如何实现，webpack如何进行配置
-
-
-
 ### AMD 和 CMD
 
 :::tip
@@ -753,8 +740,6 @@ vuex 和 vue-router 的插件注册方法 install 判断如果系统存在实例
 * 异步路由
 * 第三方插件的按需加载
 * 适当采用 keep-alive 缓存组件
-* 防抖、节流的运用
-* 服务端渲染 SSR or 预渲染
 
 ### vue.mixin使用场景和原理
 
@@ -770,12 +755,16 @@ keep-alive是 Vue 内置的一个组件，可以实现组件缓存，当组件�
 * 常用的属性：include/exclude，运行组件有条件的进行缓存；
 * 声明周期 activated/deactivated; <br/>
 
+keep-alive是一个抽象组件，自身不会渲染一个DOM元素，也不会出现在父组件链中链中，在初始阶段会调用initLifecycle里面会判断父级是否为抽象组件，如果是抽象组件，就选取抽象组件的上一级作为父级，忽略与抽象组件和子组件之间的层级关系。
+
 keep-alive 原理：keep-alive运用LRU算法，选择最近最久未使用的组件予以淘汰
 
 拓展补充：LRU算法是什么？
 1. 将新数据从尾部插入到`this.keys`中
 2. 每当缓存命中，将数据移动到`this.keys`的尾部
 3. 当`this.keys`满的时候，将头部的数据丢弃
+
+[详细说明](https://juejin.cn/post/6862206197877964807)
 
 ### vue.set 方法原理
 
@@ -1435,7 +1424,13 @@ cache-control: no-store（真正的不缓存数据到本地） public（可以�
 
 * 200 请求成功
 * 301 资源被永久转移到其他URL
-* 304 无需再次传输请求的内容，也就是说可以使用缓存的内容
+* 304 客户端有缓存情况下服务端的一种响应
+  ```text
+  Last-Modified: 是服务器端文件的最后修改时间，需和cache-control共同使用，是检查服务器端资源是否更新的一种方式
+
+  第一次请求的时候：状态码是200，同时有个Last-Modified的属性标记此文件在服务器端最后被修改的时间
+  第二次请求的时候：浏览器会携带保存的Last-Modifie分别作为IF-Modified-Since放入请求头携带过去，服务端只需要判断这个时间和当前请求文件的修改时间就可以确定是返回304还是200
+  ```
 * 404 请求资源不存在
 * 500 内部服务器错误
 
@@ -1443,15 +1438,8 @@ cache-control: no-store（真正的不缓存数据到本地） public（可以�
 ## 前端工程化 🚩
 
 ### 网页加载优化
-接口访问优化
-* 合并js、css图片等文件，合并成一个文件，浏览器就只需要请求一次就可以了
-* 减少cookie传输，在客户端和服务器之间交换，尽可能地控制cookie的大小，减少传输
 * 使用CDN提供静态文件
-* 启用GZIP编码；开启GZIP后有两个好处：一是减少存储空间，二是通过网络传输文件时可以减少传输时间（服务器会把网页内容压缩后传输）
-* 减少页面重定向；
 * 借用浏览器缓存；请求到的数据可以缓存到浏览器，下次使用的时候无需再次获取，直接取缓存数据就可以；
-静态资源优化
-* 压缩html、css、js等文件
 * 非阻塞js；js会阻止html文档的正常解析，所以经常会把script引入的js，放到html最底下。若需要让脚本位于页面顶部，会添加非阻塞属性（`defer` 和 `async`）
   ```javascript
   // 使用defer: 表示脚本可以延迟到文档完全被解释和显示之后再执行(在DOM完全构建完成后再运行，但会在DOMContentLoaded之后)
@@ -1460,18 +1448,34 @@ cache-control: no-store（真正的不缓存数据到本地） public（可以�
   <script async src="foo.js"></script>
   ```
 * 图片压缩
-* 矢量图替代位图：svg 一般比 图像小很多，而且缩小的时候不失真
-页面渲染速度
-* 懒加载
-* 设置大小，避免重绘
-* 减少DOM元素
-* 减少flash使用：flash文件比较大，加载起来消耗大
-
+* 图片懒加载，预加载
+* 组件路由懒加载
+  ```js
+  // 比如vue router
+  const userDetails = () => import('./views/UserDetails')
+  const router = createRouter({
+    routes: [{path: '/users/:id', component: userDetails}]
+  })
+  // react 懒加载
+  // 使用 react.lazy 或者 react-loadable
+  ```
+* 减少重绘
+* 页面使用loading
+* watch 和 computed 的区别使用
+* v-if 和 v-show的区别使用
+* keep-alive 的使用
+* useMemo 和 useCallBack 的区别使用
+* 不在render中处理数据
+* 添加唯一的key值
+* 使用 Fragments，减少没必要的标签
+* 骨架屏的使用
+* 防抖、节流的运用
+* 服务端渲染 SSR or 预渲染
 ### webpack 理解
 
 webPack是代码打包工具，存在出口、入口、loader和插件。webpack是一个用于现代JavaScript应用程序的静态模块打包工具	<br>
 
-1. loader: 它是一个转换器，将文件A转换陈文件B
+1. loader: 它是一个转换器，将文件A转换成文件B
 2. plugin: 它是一个拓展器，丰富了webpack本身，针对的是loader结束后，webpack打包整个过程，它不直接操作文件，而是基于事件机制工作，会监听打包过程中的节点，执行广泛任务。
 
 ### loader 和 plugin
@@ -1499,7 +1503,6 @@ webPack是代码打包工具，存在出口、入口、loader和插件。webpack
 * @babel/polyfill 用于处理JS兼容性问题，例如IE浏览器不支持Promise
 * optimize-css-assets-webpack-plugin 用于压缩css
 * eslint-webpack-plugin 用于检查代码中的错误
-
 
 ### webpack & rollup
 
