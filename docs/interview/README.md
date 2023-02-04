@@ -550,6 +550,21 @@ v-for和v-if不要在同一标签中使用，因为解析时先解析v-for在解
 2. 使用getter收集依赖，setter通知watcher派发更新
 3. watcher发布订阅模式
 
+详细说明：
+1. new Vue()首先执行初始化，对data执行响应性处理，这个过程发生在Observe中，也就是将data中的每个属性用 Object.defineProperty() 实现数据劫持，并且为每个属性分配一个dep，这个dep有一个subs属性，是一个数组，专门是用来记录该属性的订阅者的
+2. 同时对模板执行编译，找到其中动态绑定的数据，从data中获取并初始化视图，这个过程发生在compile中，编译过程中如果模板使用到了该属性，那么就会触发到该属性的get方法，里面会调用该属性dep的addSub方法，给dep数组添加watcher，遇到v-model会添加一个订阅者，({})也会添加一个订阅者，v-bind也会添加一个订阅者；如果是模板中的元素绑定了v-model就会为它添加监听事件
+3. 当在绑定v-model的元素上修了值就等于为该修改了属性的值，则会触发该属性的set方法，在set方法内通知属性对应的dep，然后循环调用所有的watcher的update方法更新视图
+
+
+### diff原理
+
+虚拟dom更新的时候，会执行update，update方法中又会调用patch，根据新旧vnode对比转换成真正的DOM节点，diff算法用在了patch过程中。patch主要做了四个判断：
+1. 没有新节点，直接触发旧节点的destory钩子；
+2. 没有旧节点，说明是页面刚开始初始化的时候，此时根本不需要比较了，直接全部都是新建，所以只调用createElm;
+3. 旧节点和新节点自身一样，通过sameVnode判断节点是否一样，一样时，直接调用patchVnode去处理这两个节点；
+4. 旧节点和新节点自身不一样，当两个节点不一样的时候，直接创建新节点，删除旧节点；
+[详情说明](https://juejin.cn/post/6881907432541552648)
+
 ### vue如何检测数组变化
 
 数组考虑性能的问题没有用definePropety对数组的每一项进行拦截，而是选择对7种数组方法进行重写（push shift pop unshift splice reserve sort），需要通过以上7种变异方法修改数组才会触发数组对应的watcher进行更新。
